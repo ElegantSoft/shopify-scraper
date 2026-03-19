@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 class Product:
     title: str
     handle: str
+    description: str | None = None
     image: str | None = None
     images: list[str] = field(default_factory=list)
     price: str | None = None
@@ -45,6 +46,7 @@ class StoreData:
                     all_products.append({
                         "title": p.title,
                         "handle": p.handle,
+                        "description": p.description,
                         "image": p.image,
                         "images": p.images,
                         "price": p.price,
@@ -191,10 +193,12 @@ def _scrape_products_for_collection(
                 {"name": o.get("name", ""), "values": o.get("values", [])}
                 for o in p.get("options", [])
             ]
+            description = p.get("body_html") or ""
             collection.products.append(
                 Product(
                     title=p.get("title", ""),
                     handle=p.get("handle", ""),
+                    description=description,
                     image=all_images[0] if all_images else None,
                     images=all_images,
                     price=price,

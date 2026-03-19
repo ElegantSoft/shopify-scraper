@@ -78,6 +78,7 @@ Collections and products are separate top-level arrays. Products are deduplicate
     {
       "title": "Cool T-Shirt",
       "handle": "cool-t-shirt",
+      "description": "<p>A lightweight, breathable t-shirt...</p>",
       "image": "https://cdn.shopify.com/.../product-thumb.jpg",
       "images": [
         "https://cdn.shopify.com/.../product-thumb.jpg",
