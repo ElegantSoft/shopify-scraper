@@ -14,6 +14,7 @@ class Product:
     title: str
     handle: str
     image: str | None = None
+    images: list[str] = field(default_factory=list)
     price: str | None = None
     url: str | None = None
     options: list[dict] = field(default_factory=list)
@@ -45,6 +46,7 @@ class StoreData:
                         "title": p.title,
                         "handle": p.handle,
                         "image": p.image,
+                        "images": p.images,
                         "price": p.price,
                         "url": p.url,
                         "options": p.options,
@@ -182,8 +184,7 @@ def _scrape_products_for_collection(
         if not batch:
             break
         for p in batch:
-            images = p.get("images", [])
-            first_image = images[0]["src"] if images else None
+            all_images = [img["src"] for img in p.get("images", []) if img.get("src")]
             raw_variants = p.get("variants", [])
             price = raw_variants[0]["price"] if raw_variants else None
             options = [
@@ -194,7 +195,8 @@ def _scrape_products_for_collection(
                 Product(
                     title=p.get("title", ""),
                     handle=p.get("handle", ""),
-                    image=first_image,
+                    image=all_images[0] if all_images else None,
+                    images=all_images,
                     price=price,
                     url=f"{base}/products/{p.get('handle', '')}",
                     options=options,
