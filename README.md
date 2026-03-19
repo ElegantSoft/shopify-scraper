@@ -1,10 +1,12 @@
 # Shopify Store Scraper
 
-Extract **title**, **logo**, **collections**, and **products** from any Shopify store using its public JSON endpoints.
+Extract **title**, **logo**, **collections**, and **products** (with options) from any Shopify store using its public JSON endpoints.
 
 ## Setup
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -34,7 +36,31 @@ python main.py https://example-store.myshopify.com -o store.json
 python main.py https://example-store.myshopify.com --no-products
 ```
 
+### Limit collections and products
+
+```bash
+# 10 collections, 50 products per collection
+python main.py https://example-store.myshopify.com -c 10 -p 50
+
+# Unlimited
+python main.py https://example-store.myshopify.com -c 0 -p 0
+```
+
+Defaults: **5 collections**, **20 products per collection**.
+
+## Options
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--json` | Output raw JSON | Pretty table |
+| `-o FILE` | Save JSON to file | — |
+| `--no-products` | Skip product fetching | Fetch products |
+| `-c N` | Max collections (0 = unlimited) | 5 |
+| `-p N` | Max products per collection (0 = unlimited) | 20 |
+
 ## Output Structure
+
+Collections and products are separate top-level arrays. Products are deduplicated across collections.
 
 ```json
 {
@@ -45,14 +71,24 @@ python main.py https://example-store.myshopify.com --no-products
     {
       "title": "Summer Collection",
       "handle": "summer-collection",
-      "image": "https://cdn.shopify.com/.../collection.jpg",
-      "products": [
+      "image": "https://cdn.shopify.com/.../collection.jpg"
+    }
+  ],
+  "products": [
+    {
+      "title": "Cool T-Shirt",
+      "handle": "cool-t-shirt",
+      "image": "https://cdn.shopify.com/.../product.jpg",
+      "price": "29.99",
+      "url": "https://example-store.myshopify.com/products/cool-t-shirt",
+      "options": [
         {
-          "title": "Cool T-Shirt",
-          "handle": "cool-t-shirt",
-          "image": "https://cdn.shopify.com/.../product.jpg",
-          "price": "29.99",
-          "url": "https://example-store.myshopify.com/products/cool-t-shirt"
+          "name": "Size",
+          "values": ["S", "M", "L", "XL"]
+        },
+        {
+          "name": "Color",
+          "values": ["Black", "White"]
         }
       ]
     }
@@ -68,4 +104,4 @@ Shopify stores expose public JSON endpoints:
 - `/collections.json` — all collections
 - `/collections/{handle}/products.json` — products per collection
 
-The scraper hits these endpoints and falls back to HTML parsing for the logo.
+The scraper hits these endpoints and falls back to HTML parsing for the logo and collection images.
